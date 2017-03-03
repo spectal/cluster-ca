@@ -1,5 +1,5 @@
 #!/bin/bash
-set -x
+
 if [ $# -lt 1 ]
 then
     echo "$0 <name-of-ca>"
@@ -15,7 +15,7 @@ cat openssl.config.tpl | \
     sed -e 's/__ORGUNIT__/'$caname'/' > $caname/openssl.cnf
 
 cd $caname
-mkdir private certs newcerts crl
+mkdir private certs newcerts crl reqs
 
 touch index.txt
 echo '01' > serial

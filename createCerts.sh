@@ -31,12 +31,12 @@ createServer(){
         fi
 
         openssl req -config openssl.cnf -new -nodes \
-          -keyout private/$server.key -out $server.csr
+          -keyout private/$server.key -out reqs/$server.csr
 
         openssl ca -config openssl.cnf -extensions cluster_server \
           -keyfile private/ca.key \
           -cert certs/ca.crt \
-          -out certs/$server.crt -infiles $server.csr
+          -out certs/$server.crt -infiles reqs/$server.csr
 
     done
 }
@@ -46,12 +46,12 @@ createClient(){
     unset SAN
     client="$1"
     openssl req -config openssl.cnf -new -nodes \
-        -keyout private/client-$client.key -out client-$client.csr
+        -keyout private/client-$client.key -out reqs/client-$client.csr
 
     openssl ca -config openssl.cnf -extensions cluster_client \
         -keyfile private/ca.key \
         -cert certs/ca.crt \
-        -out certs/client-$client.crt -infiles client-$client.csr
+        -out certs/client-$client.crt -infiles reqs/client-$client.csr
 }
 
 
