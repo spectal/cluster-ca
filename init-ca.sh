@@ -11,6 +11,8 @@ caname="$1"
 mkdir -p "$caname"
 cp createCerts.sh "$caname"
 chmod 755 $caname/createCerts.sh
+cp revokeCerts.sh "$caname"
+chmod 755 $caname/revokeCerts.sh
 cat openssl.config.tpl | \
     sed -e 's/__ORGUNIT__/'$caname'/' > $caname/openssl.cnf
 
@@ -19,6 +21,7 @@ mkdir private certs newcerts crl reqs
 
 touch index.txt
 echo '01' > serial
+echo '01' > crlnumber
 
 if [ -e "$(which pass)" ]
 then
@@ -32,5 +35,5 @@ fi
 
 openssl req -config openssl.cnf \
     -new -x509 -extensions v3_ca \
-    -keyout private/ca.key -out certs/ca.crt
+    -newkey rsa:4096 -nodes -keyout private/ca.key -out certs/ca.crt
 
