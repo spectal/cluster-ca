@@ -6,34 +6,36 @@ then
     exit 1
 fi
 
+if [ "$CAPASSWORD" != "true" ]
+then
+    echo "Variable CAPASSWORD is not set. CA key will NOT be password protected."
+    echo "If you want to protect you CA key, set CAPASSWORD to 'true'."
+    read -p "Ctrl-C to abort." abort
+    USEPASSWORD="-nodes"
+else
+    USEPASSWORD=""
+fi
+
+
 caname="$1"
 
 mkdir -p "$caname"
 cp createCerts.sh "$caname"
-chmod 755 $caname/createCerts.sh
+chmod 755 "$caname/createCerts.sh"
 cp revokeCerts.sh "$caname"
-chmod 755 $caname/revokeCerts.sh
+chmod 755 "$caname/revokeCerts.sh"
 cat openssl.config.tpl | \
-    sed -e 's/__ORGUNIT__/'$caname'/' > $caname/openssl.cnf
+    sed -e "s/__ORGUNIT__/$caname/" > "$caname/openssl.cnf"
 
-cd $caname
+cd "$caname"
 mkdir private certs newcerts crl reqs
 
 touch index.txt
+echo "unique_subject = yes" > index.txt.attr
 echo '01' > serial
 echo '01' > crlnumber
 
-if [ -e "$(which pass)" ]
-then
-    pass generate cluster-ca/$caname/ca-key-pass 23
-else
-    echo "here is a password suggestion"
-    cat /dev/urandom | tr -dc 'a-zA-Z0-9\.\(\)\_:\?\&/%$!\{\}"' | fold -w 32 | head -n 1
-    echo 
- 
-fi
-
 openssl req -config openssl.cnf \
-    -new -x509 -extensions v3_ca \
-    -newkey rsa:4096 -nodes -keyout private/ca.key -out certs/ca.crt
+    -new -x509 -extensions v3_ca -days 3650 \
+    -newkey rsa:4096 $USEPASSWORD -keyout private/ca.key -out certs/ca.crt
 

@@ -30,6 +30,9 @@ policy           = policy_cluster
 authorityKeyIdentifier = keyid:always,issuer:always
 
 [ policy_cluster ]
+countryName             = optional
+stateOrProvinceName     = optional
+localityName            = optional
 organizationName        = optional
 organizationalUnitName  = optional
 commonName              = supplied
@@ -47,10 +50,12 @@ countryName                = Country Name (2 letter code)
 countryName_default        = XX
 countryName_min            = 2
 countryName_max            = 2
-commonName                 = Common Name (FQDN) 
-organizationName         = Organization Name (eg, company)
-organizationName_default = __ORGUNIT__
-organizationalUnitName   = purpose for this cert (e.g. admin-rpc)
+commonName                 = Common Name (e.g. FQDN) 
+stateOrProvinceName        = State or Province Name (full name)
+localityName               = Locality Name (eg, city)
+organizationName           = Organization Name (e.g. company)
+organizationName_default   = __ORGUNIT__
+organizationalUnitName     = purpose for this cert (e.g. admin-rpc)
 
 [ req_attributes ]
 
