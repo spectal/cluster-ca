@@ -6,6 +6,7 @@ print_help(){
     echo "./createCerts.sh server <srv1-fqdn> <srv2-fqdn> ..."
     echo "./createCerts.sh multi  <certname> <srv1-fqdn> <srv2-fqdn> ..."
     echo "./createCerts.sh client <client-name>"
+    echo "./createCerts.sh intermediate <nopass> <certname>"
 }
 
 getSubject(){
@@ -95,6 +96,34 @@ createClient(){
         -out certs/client-$client.crt -infiles reqs/client-$client.csr
 }
 
+createIntermediate(){
+    subj="$(getSubject)"
+
+    if [[ "$1" = "nopass" ]]; then
+        nopass=true
+        shift
+    fi
+
+    intermediate_cert_name="$1"
+
+    if [[ $nopass = true ]]; then
+     echo "you decided to create passphraseless intermediate cert/s"
+     openssl req -config openssl.cnf \
+      -new -newkey rsa:4096 -nodes \
+      -out reqs/$intermediate_cert_name.csr -keyout private/$intermediate_cert_name.key.nopass \
+      -subj "$subj/CN=$intermediate_cert_name"
+    else
+      openssl req -config openssl.cnf \
+        -new -newkey rsa:4096 \
+                    -out reqs/$intermediate_cert_name.csr -keyout private/$intermediate_cert_name.key \
+        -subj "$subj/CN=$intermediate_cert_name"
+    fi
+
+    openssl x509 -req -in reqs/$intermediate_cert_name.csr \
+        -CA certs/ca.crt -CAkey private/ca.key -CAcreateserial \
+        -extensions v3_intermediate_ca -out certs/$intermediate_cert_name.crt \
+        -days 3650 -sha256
+}
 
 case "$1" in
     client) echo "create client."
@@ -111,7 +140,12 @@ case "$1" in
             shift
             createMultiServer $@
             ;;
-    
+
+    intermediate) echo "create intermediate."
+            shift
+            createIntermediate $@
+            ;;
+
          *) print_help
             exit 1
             ;;
