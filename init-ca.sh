@@ -42,22 +42,38 @@ openssl req -config openssl.cnf \
 
 if [[ $2 = 'with-intermediate' ]]
 then
+    mkdir -p intermediate
+    cd intermediate
+    mkdir certs reqs crl csr newcerts private
+    chmod 700 private
+    touch index.txt
+    echo 02 > serial
+    echo 02 > crlnumber
+    cd ..
+
+    echo "create intermediate openssl config"
+
+    cat ../openssl.config.tpl | \
+    sed -e "s/__ORGUNIT__/$caname/;s/dir = ./dir = .\/intermediate/;s/crl.pem/intermediate.crl.pem/;s/ca.crt/intermediate_ca.crt/;s/ca.key/intermediate_ca.key/" > "intermediate/openssl.cnf"
 
     echo "create intermediate key\n"
 
-    openssl genrsa -out private/intermediate_ca.key \
+    openssl genrsa -out intermediate/private/intermediate_ca.key \
         -aes256 4096
 
     echo "create csr for intermediate key\n"
 
-    openssl req -new -key private/intermediate_ca.key \
-        -out reqs/intermediate_ca.csr -subj '/C=DE/CN=interm/O=Denic'
+    openssl req -new -key intermediate/private/intermediate_ca.key \
+        -out intermediate/reqs/intermediate_ca.csr -subj '/C=DE/CN=interm/O=Denic'
 
     echo "sign intermediate key with CAs root key\n"
 
-    openssl x509 -req -in reqs/intermediate_ca.csr -CA certs/ca.crt -CAkey private/ca.key -CAcreateserial -extensions v3_ca -out certs/intermediate_ca.crt -days 3650 -sha256
+    openssl x509 -req -in intermediate/reqs/intermediate_ca.csr \
+        -CA certs/ca.crt -CAkey private/ca.key -CAcreateserial \
+        -extensions v3_intermediate_ca -out intermediate/certs/intermediate_ca.crt \
+        -days 3650 -sha256
 
     echo "createCerts.sh will sign new certs with the intermediate cert"
 
-    sed -i 's/ca.crt/intermediate_ca.crt/g;s/ca.key/intermediate_ca.key/g' createCerts.sh
+    sed -i 's/certs\/ca.crt/intermediate\/certs\/intermediate_ca.crt/g;s/private\/ca.key/intermediate\/private\/intermediate_ca.key/g;s/openssl.cnf/intermediate\/openssl.cnf/' createCerts.sh
 fi

@@ -64,6 +64,12 @@ basicConstraints       = CA:true
 keyUsage               = keyCertSign,cRLSign
 subjectKeyIdentifier   = hash
 
+[ v3_intermediate_ca ]
+subjectKeyIdentifier = hash
+authorityKeyIdentifier = keyid:always,issuer
+basicConstraints = critical, CA:true, pathlen:0
+keyUsage = critical, digitalSignature, cRLSign, keyCertSign
+
 [ cluster_client ]
 basicConstraints       = CA:FALSE
 extendedKeyUsage       = clientAuth
