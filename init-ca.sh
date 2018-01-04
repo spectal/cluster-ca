@@ -51,7 +51,7 @@ then
     echo "create csr for intermediate key\n"
 
     openssl req -new -key private/intermediate_ca.key \
-        -out reqs/intermediateCA.csr -subj '/C=DE/CN=interm/O=Denic'
+        -out reqs/intermediate_ca.csr -subj '/C=DE/CN=interm/O=Denic'
 
     echo "sign intermediate key with CAs root key\n"
 
