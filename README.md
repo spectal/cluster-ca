@@ -14,8 +14,8 @@ cd <name_of_ca>
 ```
 Done.
 
-Use "server" followed by a list of hostnames to create multiple certs, one for every listed hostname.
-Use "client" followed by the name of the user to create a user certificate.
-Use "multi" followed by the name of the cert and a list of hostnames to create a cert which contains the listed hosts in SAN.
+Use "server" followed by a list of hostnames to create multiple certs, one for every listed hostname.  
+Use "client" followed by the name of the user to create a user certificate.  
+Use "multi" followed by the name of the cert and a list of hostnames to create a cert which contains the listed hosts in SAN.  
 
 
