@@ -56,4 +56,8 @@ then
     echo "sign intermediate key with CAs root key\n"
 
     openssl x509 -req -in reqs/intermediate_ca.csr -CA certs/ca.crt -CAkey private/ca.key -CAcreateserial -extensions v3_ca -out certs/intermediate_ca.crt -days 3650 -sha256
+
+    echo "createCerts.sh will sign new certs with the intermediate cert"
+
+    sed -i 's/ca.crt/intermediate_ca.crt/g;s/ca.key/intermediate_ca.key/g' createCerts.sh
 fi
