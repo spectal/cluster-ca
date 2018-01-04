@@ -40,7 +40,7 @@ openssl req -config openssl.cnf \
     -newkey rsa:4096 $USEPASSWORD -keyout private/ca.key -out certs/ca.crt
 
 
-if [ $2 = 'with-intermediate' ]
+if [[ $2 = 'with-intermediate' ]]
 then
 
     echo "create intermediate key\n"
