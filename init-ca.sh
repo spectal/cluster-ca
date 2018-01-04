@@ -39,3 +39,21 @@ openssl req -config openssl.cnf \
     -new -x509 -extensions v3_ca -days 3650 \
     -newkey rsa:4096 $USEPASSWORD -keyout private/ca.key -out certs/ca.crt
 
+
+if [ $2 = 'with-intermediate' ]
+then
+
+    echo "create intermediate key\n"
+
+    openssl genrsa -out private/intermediateCA.key \
+        -aes256 4096
+
+    echo "create csr for intermediate key\n"
+
+    openssl req -new -key private/intermediateCA.key \
+        -out reqs/intermediateCA.csr -subj '/C=DE/CN=interm/O=Denic'
+
+    echo "sign intermediate key with CAs root key\n"
+
+    openssl x509 -req -in reqs/intermediateCA.csr -CA certs/ca.crt -CAkey private/ca.key -CAcreateserial -extensions v3_ca -out certs/intermediate_ca.crt -days 3650 -sha256
+fi
