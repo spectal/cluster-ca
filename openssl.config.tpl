@@ -90,5 +90,5 @@ basicConstraints       = CA:FALSE
 extendedKeyUsage       = clientAuth, serverAuth
 keyUsage               = critical, digitalSignature, keyEncipherment
 subjectKeyIdentifier   = hash
-authorityKeyIdentifier=keyid,issuer_always
+authorityKeyIdentifier=keyid,issuer:always
 subjectAltName         = ${ENV::SAN}
