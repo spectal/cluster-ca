@@ -88,7 +88,7 @@ subjectAltName         = ${ENV::SAN}
 [ cluster_server ]
 basicConstraints       = CA:FALSE
 extendedKeyUsage       = clientAuth, serverAuth
-keyUsage               = digitalSignature, keyEncipherment
+keyUsage               = critical, digitalSignature, keyEncipherment
 subjectKeyIdentifier   = hash
-authorityKeyIdentifier=keyid:always,issuer
-subjectAltName         = ${ENV::SAN} 
+authorityKeyIdentifier=keyid,issuer_always
+subjectAltName         = ${ENV::SAN}
