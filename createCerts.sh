@@ -3,9 +3,9 @@
 caname="$(realpath "$(dirname ${BASH_SOURCE[0]})" )"
 echo "Working in $caname"
 print_help(){
-    echo "./createCerts.sh server <srv1-fqdn> <srv2-fqdn> ..."
-    echo "./createCerts.sh multi  <certname> <srv1-fqdn> <srv2-fqdn> ..."
-    echo "./createCerts.sh client <client-name>"
+    echo "./createCerts.sh server <with-intermediate <intermediate_cert_name> <srv1-fqdn> <srv2-fqdn> ..."
+    echo "./createCerts.sh multi  <with-intermediate <intermediate_cert_name> <certname> <srv1-fqdn> <srv2-fqdn> ..."
+    echo "./createCerts.sh client <with-intermediate <intermediate_cert_name> <client-name>"
     echo "./createCerts.sh intermediate <nopass> <certname>"
 }
 
@@ -26,6 +26,15 @@ getSubject(){
 }
 
 createServer(){
+
+    signing_cert_name="ca"
+
+    if [[ "$1" = "with-intermediate" ]]; then
+        signing_cert_name=$2
+        shift 2
+    fi
+
+
     subj="$(getSubject)"
     for server in "$@"
     do
@@ -47,13 +56,20 @@ createServer(){
           -keyout private/$server.key -out reqs/$server.csr
 
         openssl ca -batch -config openssl.cnf -extensions cluster_server \
-          -keyfile private/ca.key \
-          -cert certs/ca.crt \
+          -keyfile private/$signing_cert_name.key \
+          -cert certs/$signing_cert_name.crt \
           -out certs/$server.crt -infiles reqs/$server.csr
     done
 }
 
 createMultiServer() {
+
+    signing_cert_name="ca"
+
+    if [[ "$1" = "with-intermediate" ]]; then
+        signing_cert_name=$2
+        shift 2
+    fi
 
     certname=$1
     shift
@@ -78,12 +94,19 @@ createMultiServer() {
       -keyout private/$certname.key -out reqs/$certname.csr
 
     openssl ca -batch -config openssl.cnf -extensions cluster_server \
-      -keyfile private/ca.key \
-      -cert certs/ca.crt \
+      -keyfile private/$signing_cert_name.key \
+      -cert certs/$signing_cert_name.crt \
       -out certs/$certname.crt -infiles reqs/$certname.csr
 }
 
 createClient(){
+
+    signing_cert_name="ca"
+
+    if [[ "$1" = "with-intermediate" ]]; then
+        signing_cert_name=$2
+        shift 2
+    fi
 
     unset SAN
     client="$1"
@@ -110,7 +133,7 @@ createIntermediate(){
      echo "you decided to create passphraseless intermediate cert/s"
      openssl req -config openssl.cnf \
       -new -newkey rsa:4096 -nodes \
-      -out reqs/$intermediate_cert_name.csr -keyout private/$intermediate_cert_name.key.nopass \
+      -out reqs/$intermediate_cert_name.csr -keyout private/$intermediate_cert_name.key \
       -subj "$subj/CN=$intermediate_cert_name"
     else
       openssl req -config openssl.cnf \
