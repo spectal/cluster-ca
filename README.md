@@ -18,7 +18,3 @@ Use "server" followed by a list of hostnames to create multiple certs, one for e
 Use "client" followed by the name of the user to create a user certificate.
 Use "multi" followed by the name of the cert and a list of hostnames to create a cert which contains the listed hosts in SAN.
 Use "intermediate" followed by a cert name to create an intermediate cert, optional nopass creates a cert without passphrase.
-
-
-
-
